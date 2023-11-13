@@ -31,6 +31,10 @@ with open(DATAFILENAME, newline='') as datafile:
                         "count" : clusters[clusterName]["count"] + 1
                     })
 
+
+###
+### FUNCTION DEFINITIONS
+###
 # Function to calculate fraction of the luminosity function above lmin
 def fraction_above(lmin):
     return 0.5 * erfc((math.log10(lmin) - a) / b / math.sqrt(2))
@@ -42,6 +46,10 @@ def likelihood(n):
     denominator = math.factorial(o) * math.factorial(n - o)
     result = (numerator / denominator) * (f ** o) * ((1 - f) ** (n - o))
     return result
+
+###
+### PROCESSING
+###
 
 for clusterName in clusters.keys(): #loop through every cluster in dataset
     if clusters[clusterName]["count"] >= minCount:

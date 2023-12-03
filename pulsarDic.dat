@@ -1,0 +1,106 @@
+{
+    "47 Tucanae": {
+        "obsCount": 22,
+        "probableCount": 133
+    },
+    "NGC 1851": {
+        "obsCount": 14,
+        "probableCount": 211
+    },
+    "NGC 5139": {
+        "obsCount": 5,
+        "probableCount": 26
+    },
+    "NGC 5272": {
+        "obsCount": 4,
+        "probableCount": 24
+    },
+    "NGC 5904": {
+        "obsCount": 5,
+        "probableCount": 26
+    },
+    "NGC 5986": {
+        "obsCount": 1,
+        "probableCount": 25
+    },
+    "NGC 6121": {
+        "obsCount": 1,
+        "probableCount": 73
+    },
+    "NGC 6205": {
+        "obsCount": 6,
+        "probableCount": 32
+    },
+    "NGC 6266": {
+        "obsCount": 7,
+        "probableCount": 32
+    },
+    "NGC 6342": {
+        "obsCount": 1,
+        "probableCount": 294
+    },
+    "Terzan 5": {
+        "obsCount": 39,
+        "probableCount": 179
+    },
+    "NGC 6440": {
+        "obsCount": 5,
+        "probableCount": 83
+    },
+    "NGC 6441": {
+        "obsCount": 3,
+        "probableCount": 55
+    },
+    "NGC 6517": {
+        "obsCount": 7,
+        "probableCount": 26
+    },
+    "NGC 6522": {
+        "obsCount": 4,
+        "probableCount": 15
+    },
+    "NGC 6539": {
+        "obsCount": 1,
+        "probableCount": 1477
+    },
+    "NGC 6544": {
+        "obsCount": 1,
+        "probableCount": 100
+    },
+    "NGC 6624": {
+        "obsCount": 6,
+        "probableCount": 95
+    },
+    "NGC 6626": {
+        "obsCount": 3,
+        "probableCount": 11
+    },
+    "NGC 6656": {
+        "obsCount": 2,
+        "probableCount": 9
+    },
+    "NGC 6712": {
+        "obsCount": 1,
+        "probableCount": 7
+    },
+    "NGC 6749": {
+        "obsCount": 1,
+        "probableCount": 12
+    },
+    "NGC 6752": {
+        "obsCount": 4,
+        "probableCount": 30
+    },
+    "NGC 6838": {
+        "obsCount": 1,
+        "probableCount": 8
+    },
+    "NGC 7078": {
+        "obsCount": 8,
+        "probableCount": 1034
+    },
+    "NGC 7099": {
+        "obsCount": 1,
+        "probableCount": 45
+    }
+}

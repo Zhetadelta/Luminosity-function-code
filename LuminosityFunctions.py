@@ -1,6 +1,8 @@
 #  infer number of pulsars in a globular cluster given a luminosity function, number of observed pulsars and minimum luminosity
+from calendar import c
 import math, csv
 import numpy as np
+from json import dump, load
 from os import path
 from scipy.special import erfc
 import matplotlib.pyplot as plt
@@ -51,6 +53,8 @@ def likelihood(n):
 ### PROCESSING
 ###
 
+clusterInfo = {}
+
 for clusterName in clusters.keys(): #loop through every cluster in dataset
     if clusters[clusterName]["count"] >= minCount:
         #read in cluster-specific values
@@ -75,3 +79,13 @@ for clusterName in clusters.keys(): #loop through every cluster in dataset
         plt.gcf().text(0.98,0.03,f"{o} pulsars \nabove {l} mJy kpc^2\n({round(fraction_above(l)*100,2)}% probed)", horizontalalignment='right')
         plt.gcf().text(0.02,0.05,f"Assuming log-normal of\nmean {a} and sigma {b}")
         plt.savefig(path.join(".","plots",f"{clusterName}.png"))
+        #Add cluster to dictionary
+        clusterInfo.update({
+                clusterName : {
+                        "obsCount": clusters[clusterName]["count"],
+                        "probableCount" : nhat
+                }
+            })
+        
+with open("pulsarDic.dat", "w+") as out:
+    dump(clusterInfo, out, indent = 4)

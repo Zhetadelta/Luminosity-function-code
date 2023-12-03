@@ -20,6 +20,8 @@ with open(DATAFILENAME, newline='') as datafile:
     fileReader = csv.reader(datafile)
     for row in fileReader: 
         clusterName = row[1]
+        if clusterName == "47 Tucanae": #Force 47 Tuc to use NGC name for ReadClusterData.py processing
+            clusterName = "NGC 104"
         lumValue = row[9]
         if row[0] != "Name" and lumValue: #exclude header row, only count pulsars with luminosities
             if clusterName not in clusters:
@@ -87,5 +89,5 @@ for clusterName in clusters.keys(): #loop through every cluster in dataset
                 }
             })
         
-with open("pulsarDic.dat", "w+") as out:
+with open("firstPass.dat", "w+") as out:
     dump(clusterInfo, out, indent = 4)

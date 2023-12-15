@@ -75,13 +75,19 @@ for valueName, title, yLable in GENERATE_PLOTS:
     plt.clf()
     xValues = []
     yValues = []
+    xErrorMin = []
+    xErrorMax = []
     for clusterName in clusterDic.keys():
         xValues.append(clusterDic[clusterName]["probableCount"])
         yValues.append(clusterDic[clusterName][valueName])
-    plt.scatter(xValues, yValues)
+        xErrorMin.append(clusterDic[clusterName]["95min"])
+        xErrorMax.append(clusterDic[clusterName]["95max"])
+    xError = [xErrorMin, xErrorMax]
+    #plt.scatter(xValues, yValues)
     plt.xscale("log")
     #plt.yscale("log")
     plt.title(title)
     plt.xlabel("Most probable count of pulsars")
     plt.ylabel(yLable)
+    plt.errorbar(xValues, yValues, xerr=xError, fmt='or', capsize=0)
     plt.savefig(path.join(".","plots","properties",f"{valueName}.png"))

@@ -1,106 +1,158 @@
 {
     "NGC 104": {
         "obsCount": 22,
-        "probableCount": 133
+        "probableCount": 133,
+        "95min": 92,
+        "95max": 195
     },
     "NGC 1851": {
         "obsCount": 14,
-        "probableCount": 211
+        "probableCount": 211,
+        "95min": 129,
+        "95max": 347
     },
     "NGC 5139": {
         "obsCount": 5,
-        "probableCount": 26
+        "probableCount": 26,
+        "95min": 13,
+        "95max": 48
     },
     "NGC 5272": {
         "obsCount": 4,
-        "probableCount": 24
+        "probableCount": 24,
+        "95min": 10,
+        "95max": 44
     },
     "NGC 5904": {
         "obsCount": 5,
-        "probableCount": 26
+        "probableCount": 26,
+        "95min": 13,
+        "95max": 48
     },
     "NGC 5986": {
         "obsCount": 1,
-        "probableCount": 25
+        "probableCount": 25,
+        "95min": 5,
+        "95max": 47
     },
     "NGC 6121": {
         "obsCount": 1,
-        "probableCount": 73
+        "probableCount": 73,
+        "95min": 13,
+        "95max": 141
     },
     "NGC 6205": {
         "obsCount": 6,
-        "probableCount": 32
+        "probableCount": 32,
+        "95min": 16,
+        "95max": 58
     },
     "NGC 6266": {
         "obsCount": 7,
-        "probableCount": 32
+        "probableCount": 32,
+        "95min": 17,
+        "95max": 57
     },
     "NGC 6342": {
         "obsCount": 1,
-        "probableCount": 294
+        "probableCount": 294,
+        "95min": 54,
+        "95max": 571
     },
     "Terzan 5": {
         "obsCount": 39,
-        "probableCount": 179
+        "probableCount": 179,
+        "95min": 136,
+        "95max": 236
     },
     "NGC 6440": {
         "obsCount": 5,
-        "probableCount": 83
+        "probableCount": 83,
+        "95min": 37,
+        "95max": 155
     },
     "NGC 6441": {
         "obsCount": 3,
-        "probableCount": 55
+        "probableCount": 55,
+        "95min": 20,
+        "95max": 104
     },
     "NGC 6517": {
         "obsCount": 7,
-        "probableCount": 26
+        "probableCount": 26,
+        "95min": 15,
+        "95max": 46
     },
     "NGC 6522": {
         "obsCount": 4,
-        "probableCount": 15
+        "probableCount": 15,
+        "95min": 7,
+        "95max": 27
     },
     "NGC 6539": {
         "obsCount": 1,
-        "probableCount": 1477
+        "probableCount": 1477,
+        "95min": 270,
+        "95max": 2873
     },
     "NGC 6544": {
         "obsCount": 1,
-        "probableCount": 100
+        "probableCount": 100,
+        "95min": 18,
+        "95max": 193
     },
     "NGC 6624": {
         "obsCount": 6,
-        "probableCount": 95
+        "probableCount": 95,
+        "95min": 46,
+        "95max": 176
     },
     "NGC 6626": {
         "obsCount": 3,
-        "probableCount": 11
+        "probableCount": 11,
+        "95min": 5,
+        "95max": 20
     },
     "NGC 6656": {
         "obsCount": 2,
-        "probableCount": 9
+        "probableCount": 9,
+        "95min": 3,
+        "95max": 16
     },
     "NGC 6712": {
         "obsCount": 1,
-        "probableCount": 7
+        "probableCount": 7,
+        "95min": 1,
+        "95max": 12
     },
     "NGC 6749": {
         "obsCount": 1,
-        "probableCount": 12
+        "probableCount": 12,
+        "95min": 2,
+        "95max": 22
     },
     "NGC 6752": {
         "obsCount": 4,
-        "probableCount": 30
+        "probableCount": 30,
+        "95min": 13,
+        "95max": 56
     },
     "NGC 6838": {
         "obsCount": 1,
-        "probableCount": 8
+        "probableCount": 8,
+        "95min": 2,
+        "95max": 14
     },
     "NGC 7078": {
         "obsCount": 8,
-        "probableCount": 1034
+        "probableCount": 1034,
+        "95min": 532,
+        "95max": 1882
     },
     "NGC 7099": {
         "obsCount": 1,
-        "probableCount": 45
+        "probableCount": 45,
+        "95min": 8,
+        "95max": 86
     }
 }

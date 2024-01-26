@@ -11,19 +11,20 @@ with open("firstPass.dat") as dicFile:
 #hard-coded column name, start of slice, end of slice tuples for table III properties
 DATA_FILE_COLUMNS = [
         ("radialVelocity", 13, 20), #this should have no correlation, good to check
-        ("centralConcentration", 50, 55),
-        ("coreObsRadiusArcMin", 60, 65), #in arcmin, need cluster distance
+        ("centralConcentration", 49, 55),
+        ("coreObsRadiusArcMin", 59, 65), #in arcmin, need cluster distance
         ("luminosityDensity", 80, 87),
-        ("velocityDispersion", 37, 42),
+        ("velocityDispersion", 36, 42),
     ]
 
 GENERATE_PLOTS = [ #code name, table header tuples
         ("radialVelocity", "Pulsar Count vs Heliocentric Radial Velocity", "Radial Velocity (km s^-1)"),
         ("centralConcentration", "Pulsar Count vs King-model Central Concentration", "Central Concentration"),
-        ("luminosityDensity", "Pulsar Count vs Central Luminosity Density", "Luminosity Density (L_☉ pc^-3)"),
+        ("luminosityDensity", "Pulsar Count vs Central Luminosity Density", "Luminosity Density, log(L_☉ pc^-3)"),
         ("coreRadiusPc", "Pulsar Count vs Core Radius", "Core Radius (pc)"),
-        ("velocityDispersion", "Pulsar Count vs Central Velocity Dispersion", "Central Velocity Dispersion (km/s)"),
-        ("metallicity", "Pulsar Count vs Cluster Metallicity", "Metallicity (Fe/H)")
+        ("velocityDispersion", "Pulsar Count vs Central Velocity Dispersion", "Central Velocity Dispersion, log(km/s)"),
+        ("metallicity", "Pulsar Count vs Cluster Metallicity", "Metallicity (Fe/H)"),
+        ("absMag", "Pulsar Count vs Absolute Visual Magnitude", "Absolute Magnitude")
     ]
 
 MIN_OBSERVATIONS = 0 #adjust to eliminate low-data clusters
@@ -44,9 +45,10 @@ with open("clusterData.dat") as dataFile:
             raise ValueError(f"{clusterName} is invalid. Perhaps it has a different name?")
         #Retrieve cluster distance from table I
         rowNumI = idListTableI.index(clusterName)
-        clusterDic[clusterName]["distanceKPc"] = float(dataFileTableI[rowNumI][68:73]) 
+        clusterDic[clusterName]["distanceKPc"] = float(dataFileTableI[rowNumI][67:74]) 
         rowNumMetal = idListTableII.index(clusterName)
-        clusterDic[clusterName]["metallicity"] = float(dataFileTableII[rowNumMetal][14:19])
+        clusterDic[clusterName]["metallicity"] = float(dataFileTableII[rowNumMetal][12:19])
+        clusterDic[clusterName]["absMag"] = float(dataFileTableII[rowNumMetal][47:54])
         #Go through desired properties defined in DATA_FILE_COLUMNS and add to clusterDic
         rowNum = idListTableIII.index(clusterName)
         for prop, start, end in DATA_FILE_COLUMNS:

@@ -1,6 +1,6 @@
 ﻿from os import path
 from json import load
-from numpy import arange
+from numpy import arange, mean, corrcoef, sqrt
 import matplotlib.pyplot as plt
 
 clusterDic = {}
@@ -72,24 +72,42 @@ for clusterName in clusterDic.keys():
             "coreRadiusPc" : d*r_o #small-angle approximation is our friend
         })
 
+properties = {}
     
 for valueName, title, yLable in GENERATE_PLOTS:
-    plt.clf()
     xValues = []
     yValues = []
-    xErrorMin = []
-    xErrorMax = []
     for clusterName in clusterDic.keys():
-        xValues.append(clusterDic[clusterName]["probableCount"])
-        yValues.append(clusterDic[clusterName][valueName])
-        xErrorMin.append(clusterDic[clusterName]["95min"])
-        xErrorMax.append(clusterDic[clusterName]["95max"])
-    xError = [xErrorMin, xErrorMax]
-    #plt.scatter(xValues, yValues)
-    plt.yscale("log")
-    #plt.xscale("log")
-    plt.title(title)
-    plt.ylabel("Most probable count of pulsars")
-    plt.xlabel(yLable)
-    plt.errorbar(yValues, xValues, yerr=xError, fmt='or', capsize=0) #swap the x and y axes the messy way
-    plt.savefig(path.join(".","plots","properties",f"{valueName}.png"))
+        yValues.append(clusterDic[clusterName]["probableCount"])
+        xValues.append(clusterDic[clusterName][valueName])
+        
+    properties[valueName] = list(zip(xValues, yValues))
+
+#find corrrelation coefficient via Pearson product-moment
+#use numpy.corrcoef to check implementation
+
+coeffs = {}
+
+for prop in properties.keys():
+    valueTuples = properties[prop]
+    propList, countList = ([x[0] for x in valueTuples], [x[1] for x in valueTuples])
+    propMean, countMean = (mean(propList), mean(countList))
+    num = 0
+    sumPropSquared = 0
+    sumCountSquared = 0
+    for i in range(len(propList)):
+        num += (propList[i] - propMean)*(countList[i] - countMean)
+        sumPropSquared += (propList[i] - propMean)**2
+        sumCountSquared += (countList[i] - countMean)**2
+    coeff = num/sqrt(sumPropSquared * sumCountSquared)
+
+    npcoeff = corrcoef(propList, y=countList)[0][1]
+    coeffs[prop] = {
+            "mine" : coeff,
+            "numpy" : npcoeff
+        }
+
+with open('correlation_coefficients.txt', "+w") as file:
+    file.write("Property; This implementation; Numpy-calculated\n")
+    for prop in coeffs.keys():
+        file.write(f"{prop.ljust(23)} |{str(round(coeffs[prop]['mine'], 3)).ljust(6)}|{str(round(coeffs[prop]['numpy'], 3)).ljust(5)}\n")

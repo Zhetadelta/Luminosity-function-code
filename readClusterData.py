@@ -1,7 +1,13 @@
 ﻿from os import path
 from json import load
-from numpy import arange
+from numpy import arange, log10
 import matplotlib.pyplot as plt
+from simulation import *
+
+MAKE_CLUSTER_PLOTS_FLAG = False #change this to regen plots
+SIMULATION_ROUNDS = 100 #number of rounds to run simulation
+SIMULATION_MU = -1.1
+SIMULATION_SIGMA = 0.9
 
 clusterDic = {}
 with open("firstPass.dat") as dicFile:
@@ -71,8 +77,7 @@ for clusterName in clusterDic.keys():
     clusterData.update({
             "coreRadiusPc" : d*r_o #small-angle approximation is our friend
         })
-
-    
+ 
 for valueName, title, yLable in GENERATE_PLOTS:
     plt.clf()
     xValues = []
@@ -84,12 +89,31 @@ for valueName, title, yLable in GENERATE_PLOTS:
         yValues.append(clusterDic[clusterName][valueName])
         xErrorMin.append(clusterDic[clusterName]["95min"])
         xErrorMax.append(clusterDic[clusterName]["95max"])
-    xError = [xErrorMin, xErrorMax]
-    #plt.scatter(xValues, yValues)
-    plt.yscale("log")
-    #plt.xscale("log")
-    plt.title(title)
-    plt.ylabel("Most probable count of pulsars")
-    plt.xlabel(yLable)
-    plt.errorbar(yValues, xValues, yerr=xError, fmt='or', capsize=0) #swap the x and y axes the messy way
-    plt.savefig(path.join(".","plots","properties",f"{valueName}.png"))
+    if MAKE_CLUSTER_PLOTS_FLAG: #only if flag is set
+        xError = [xErrorMin, xErrorMax]
+        #plt.scatter(xValues, yValues)
+        plt.yscale("log")
+        #plt.xscale("log")
+        plt.title(title)
+        plt.ylabel("Most probable count of pulsars")
+        plt.xlabel(yLable)
+        plt.errorbar(yValues, xValues, yerr=xError, fmt='or', capsize=0) #swap the x and y axes the messy way
+        plt.savefig(path.join(".","plots","properties",f"{valueName}.png"))
+    plt.clf()
+
+simTotal = []
+for i in range(SIMULATION_ROUNDS): #simulation stuff
+    thisSim = []
+    for clusterName, clusterProps in clusterDic.items():        
+        thisSim.extend(generatePop(SIMULATION_MU, SIMULATION_SIGMA, clusterProps["obsCount"], clusterProps["minLum"]))
+    simTotal.extend(thisSim)
+
+if SIMULATION_ROUNDS > 0:
+    binCount = 40
+    
+    plt.hist(simTotal, bins=binCount)
+    plt.ylabel("N(L)")
+    plt.xlabel("log(L)")
+    plt.title("Simulated GC PSR Population by Luminosity")
+    plt.yticks(ticks=[])
+    plt.show()

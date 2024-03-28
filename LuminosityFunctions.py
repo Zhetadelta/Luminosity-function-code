@@ -15,7 +15,7 @@ minCount = 0 #minimum number of pulsars in cluster to be eligible
 if __name__ == "__main__":
 
     # locate data file and read clusters into dictionary
-    DATAFILENAME = "Data1102023.csv"
+    DATAFILENAME = "Data03272024.csv"
     clusters = {}
 
     with open(DATAFILENAME, newline='') as datafile:

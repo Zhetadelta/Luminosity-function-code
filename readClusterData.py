@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from simulation import *
 
 MAKE_CLUSTER_PLOTS_FLAG = False #change this to regen plots
-SIMULATION_ROUNDS = 100 #number of rounds to run simulation
+SIMULATION_ROUNDS = 1000 #number of rounds to run simulation
 SIMULATION_MU = -1.1
 SIMULATION_SIGMA = 0.9
 
@@ -116,4 +116,16 @@ if SIMULATION_ROUNDS > 0:
     plt.xlabel("log(L)")
     plt.title("Simulated GC PSR Population by Luminosity")
     plt.yticks(ticks=[])
+    plt.show()
+
+    plt.clf()
+    simTotal.sort()
+    simTotal.reverse()
+    lumValues = []
+    lumRank = []
+    for i in range(len(simTotal)):
+        lumValues.append(simTotal[i])
+        lumRank.append(log10(i))
+
+    plt.scatter(lumValues, lumRank)
     plt.show()

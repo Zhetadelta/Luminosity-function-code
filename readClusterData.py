@@ -1,10 +1,10 @@
 ﻿from os import path
 from json import load
-from numpy import arange, log10
+from numpy import arange, log10, pi
 import matplotlib.pyplot as plt
 from simulation import *
 
-MAKE_CLUSTER_PLOTS_FLAG = False #change this to regen plots
+MAKE_CLUSTER_PLOTS_FLAG = True #change this to regen plots
 SIMULATION_ROUNDS = 1000 #number of rounds to run simulation
 SIMULATION_MU = -1.1
 SIMULATION_SIGMA = 0.9
@@ -30,7 +30,7 @@ GENERATE_PLOTS = [ #code name, table header tuples
         ("coreRadiusPc", "Pulsar Count vs Core Radius", "Core Radius (pc)"),
         ("velocityDispersion", "Pulsar Count vs Central Velocity Dispersion", "Central Velocity Dispersion, log(km/s)"),
         ("metallicity", "Pulsar Count vs Cluster Metallicity", "Metallicity (Fe/H)"),
-        ("absMag", "Pulsar Count vs Absolute Visual Magnitude", "Absolute Magnitude")
+        ("absMag", "Pulsar Count vs Absolute Visual Magnitude", "Absolute Magnitude"),
     ]
 
 MIN_OBSERVATIONS = 0 #adjust to eliminate low-data clusters
@@ -66,26 +66,43 @@ with open("clusterData.dat") as dataFile:
                 clusterDic[clusterName].update({
                         prop: 0
                     })
+        #attempt to estimate total cluster mass via color + luminosity
+        clusterColor = float(dataFileTableII[rowNumMetal][60:67])
+        avgTemp = 4600.*(1/(0.92*clusterColor+1.7)+1/(0.92*clusterColor+0.62)) #Ballesteros' formula
+        #R = M^0.8; L = 4*pi*R^2*sigma*T^4; L = M^4
+        avgMass = (avgTemp/5770)**(4/3.2) #algebra in notebook; in solar masses
+        avgLum = avgMass**4
+        clusterLum = 10**(0.4*(4.85-clusterDic[clusterName]["absMag"]))
+        clusterDic[clusterName]["totalMass"] = clusterLum/avgLum*avgMass #VERY rough; solar masses 
+        clusterDic[clusterName]["numPerMass"] = clusterDic[clusterName]["probableCount"]/clusterDic[clusterName]["totalMass"]
         #set a core-collapsed boolean, just in case
         clusterDic[clusterName]["coreCollapsed"] = "c" in dataFileTableIII[rowNum][56:59]
 
 #We've got our dictionary! Still needs some massaging though. Let's calculate physical radius of cluster cores first.
+#sum all pulsar counts while we're here
+
+totalCount = 0
 for clusterName in clusterDic.keys():
     clusterData = clusterDic[clusterName]
+    totalCount += clusterData["probableCount"]
     d = clusterData["distanceKPc"] * 1000 #parsecs
     r_o = clusterData["coreObsRadiusArcMin"] * 0.000290888 #radians
     clusterData.update({
             "coreRadiusPc" : d*r_o #small-angle approximation is our friend
         })
  
+
+
 for valueName, title, yLable in GENERATE_PLOTS:
     plt.clf()
     xValues = []
+    xValuesRatios = []
     yValues = []
     xErrorMin = []
     xErrorMax = []
     for clusterName in clusterDic.keys():
         xValues.append(clusterDic[clusterName]["probableCount"])
+        xValuesRatios.append(clusterDic[clusterName]["numPerMass"])
         yValues.append(clusterDic[clusterName][valueName])
         xErrorMin.append(clusterDic[clusterName]["95min"])
         xErrorMax.append(clusterDic[clusterName]["95max"])
@@ -99,6 +116,32 @@ for valueName, title, yLable in GENERATE_PLOTS:
         plt.xlabel(yLable)
         plt.errorbar(yValues, xValues, yerr=xError, fmt='or', capsize=0) #swap the x and y axes the messy way
         plt.savefig(path.join(".","plots","properties",f"{valueName}.png"))
+        plt.clf()
+        
+        #do it again with the ratio
+        xError = [xErrorMin, xErrorMax]
+        #plt.scatter(xValues, yValues)
+        #plt.yscale("log")
+        #plt.xscale("log")
+        plt.title(title+" (per solar mass)")
+        plt.ylabel("Pulsar count per solar mass")
+        plt.xlabel(yLable)
+        plt.errorbar(yValues, xValuesRatios, fmt='or', capsize=0) #swap the x and y axes the messy way
+        plt.savefig(path.join(".","plots","properties",f"{valueName}perSolarMass.png"))
+        plt.clf()
+        
+        #do it again with the ratio (log edition)
+        xError = [xErrorMin, xErrorMax]
+        #plt.scatter(xValues, yValues)
+        plt.yscale("log")
+        #plt.xscale("log")
+        plt.title(title+" (per solar mass)")
+        plt.ylabel("Pulsar count per solar mass")
+        plt.xlabel(yLable)
+        plt.errorbar(yValues, xValuesRatios, fmt='or', capsize=0) #swap the x and y axes the messy way
+        plt.savefig(path.join(".","plots","properties",f"{valueName}perSolarMassLog.png"))
+        plt.clf()
+        
     plt.clf()
 
 simTotal = []

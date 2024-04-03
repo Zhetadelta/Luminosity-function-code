@@ -1,6 +1,6 @@
 ﻿from os import path
 from json import load
-from numpy import arange, log10, pi
+from numpy import arange, mean, corrcoef, sqrt, log10, pi
 import matplotlib.pyplot as plt
 from simulation import *
 
@@ -122,14 +122,15 @@ for clusterName in clusterDic.keys():
  
 
 
+
+properties = {}
+
 for valueName, title, yLable in GENERATE_PLOTS:
-    plt.clf()
     xValues = []
     xValuesRatios = []
     yValues = []
-    xErrorMin = []
-    xErrorMax = []
     for clusterName in clusterDic.keys():
+
         xValues.append(clusterDic[clusterName]["probableCount"])
         xValuesRatios.append(clusterDic[clusterName]["numPerMass"])
         
@@ -149,6 +150,9 @@ for valueName, title, yLable in GENERATE_PLOTS:
         if not removed:
             xErrorMin.append(clusterDic[clusterName]["95min"])
             xErrorMax.append(clusterDic[clusterName]["95max"])
+        
+    properties[valueName] = list(zip(xValues, yValues))
+        
     if MAKE_CLUSTER_PLOTS_FLAG: #only if flag is set
         xError = [xErrorMin, xErrorMax]
         #plt.scatter(xValues, yValues)
@@ -216,3 +220,33 @@ if SIMULATION_ROUNDS > 0:
 
     plt.scatter(lumValues, lumRank)
     plt.show()
+
+    
+#find corrrelation coefficient via Pearson product-moment
+#use numpy.corrcoef to check implementation
+
+coeffs = {}
+
+for prop in properties.keys():
+    valueTuples = properties[prop]
+    propList, countList = ([x[0] for x in valueTuples], [x[1] for x in valueTuples])
+    propMean, countMean = (mean(propList), mean(countList))
+    num = 0
+    sumPropSquared = 0
+    sumCountSquared = 0
+    for i in range(len(propList)):
+        num += (propList[i] - propMean)*(countList[i] - countMean)
+        sumPropSquared += (propList[i] - propMean)**2
+        sumCountSquared += (countList[i] - countMean)**2
+    coeff = num/sqrt(sumPropSquared * sumCountSquared)
+
+    npcoeff = corrcoef(propList, y=countList)[0][1]
+    coeffs[prop] = {
+            "mine" : coeff,
+            "numpy" : npcoeff
+        }
+
+with open('correlation_coefficients.txt', "+w") as file:
+    file.write("Property; This implementation; Numpy-calculated\n")
+    for prop in coeffs.keys():
+        file.write(f"{prop.ljust(23)} |{str(round(coeffs[prop]['mine'], 3)).ljust(6)}|{str(round(coeffs[prop]['numpy'], 3)).ljust(5)}\n")

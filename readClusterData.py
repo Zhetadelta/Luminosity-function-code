@@ -126,9 +126,12 @@ for clusterName in clusterDic.keys():
 properties = {}
 
 for valueName, title, yLable in GENERATE_PLOTS:
+    plt.clf()
     xValues = []
     xValuesRatios = []
     yValues = []
+    xErrorMin = []
+    xErrorMax = []
     for clusterName in clusterDic.keys():
 
         xValues.append(clusterDic[clusterName]["probableCount"])

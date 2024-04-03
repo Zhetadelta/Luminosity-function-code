@@ -6,3 +6,4 @@ coreRadiusPc            |-0.095|-0.095
 velocityDispersion      |-0.032|-0.032
 metallicity             |0.018 |0.018
 absMag                  |-0.107|-0.107
+encounterRate           |0.23  |0.23 

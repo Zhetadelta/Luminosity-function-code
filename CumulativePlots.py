@@ -102,7 +102,8 @@ for clusterName in clusters.keys(): #loop through every cluster in dataset
                         "obsCount": clusters[clusterName]["count"],
                         "probableCount" : nhat,
                         "95min" : int(intervalMin),
-                        "95max" : int(intervalMax)
+                        "95max" : int(intervalMax),
+                        "minLum" : l
                 }
             })
         

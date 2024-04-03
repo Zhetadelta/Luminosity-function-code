@@ -1,7 +1,13 @@
 ﻿from os import path
 from json import load
-from numpy import arange, mean, corrcoef, sqrt
+from numpy import arange, mean, corrcoef, sqrt, log10, pi
 import matplotlib.pyplot as plt
+from simulation import *
+
+MAKE_CLUSTER_PLOTS_FLAG = True #change this to regen plots
+SIMULATION_ROUNDS = 1000 #number of rounds to run simulation
+SIMULATION_MU = -1.1
+SIMULATION_SIGMA = 0.9
 
 clusterDic = {}
 with open("firstPass.dat") as dicFile:
@@ -24,7 +30,8 @@ GENERATE_PLOTS = [ #code name, table header tuples
         ("coreRadiusPc", "Pulsar Count vs Core Radius", "Core Radius (pc)"),
         ("velocityDispersion", "Pulsar Count vs Central Velocity Dispersion", "Central Velocity Dispersion, log(km/s)"),
         ("metallicity", "Pulsar Count vs Cluster Metallicity", "Metallicity (Fe/H)"),
-        ("absMag", "Pulsar Count vs Absolute Visual Magnitude", "Absolute Magnitude")
+        ("absMag", "Pulsar Count vs Absolute Visual Magnitude", "Absolute Magnitude"),
+        ("encounterRate", "Pulsar Count vs Encounter Rate", "Enounter Rate")
     ]
 
 MIN_OBSERVATIONS = 0 #adjust to eliminate low-data clusters
@@ -40,6 +47,12 @@ with open("clusterData.dat") as dataFile:
     idListTableIII = [row[:12].strip() for row in dataFileTableIII]
     idListTableII = [row[:12].strip() for row in dataFileTableII]
     idListTableI = [row[:12].strip() for row in dataFileTableI]
+    
+    #read encounter data in too
+    encounterList = None
+    with open("clusterEncounters.dat", "r") as encounterFile:
+        encounterList = encounterFile.readlines()
+        
     for clusterName in clusterDic.keys():
         if clusterName not in idListTableIII:
             raise ValueError(f"{clusterName} is invalid. Perhaps it has a different name?")
@@ -60,29 +73,155 @@ with open("clusterData.dat") as dataFile:
                 clusterDic[clusterName].update({
                         prop: 0
                     })
+                
+        #attempt to estimate total cluster mass via color + luminosity
+        clusterColor = float(dataFileTableII[rowNumMetal][60:67])
+        avgTemp = 4600.*(1/(0.92*clusterColor+1.7)+1/(0.92*clusterColor+0.62)) #Ballesteros' formula
+        #R = M^0.8; L = 4*pi*R^2*sigma*T^4; L = M^4
+        avgMass = (avgTemp/5770)**(4/3.2) #algebra in notebook; in solar masses
+        avgLum = avgMass**4
+        clusterLum = 10**(0.4*(4.85-clusterDic[clusterName]["absMag"]))
+        clusterDic[clusterName]["totalMass"] = clusterLum/avgLum*avgMass #VERY rough; solar masses 
+        clusterDic[clusterName]["numPerMass"] = clusterDic[clusterName]["probableCount"]/clusterDic[clusterName]["totalMass"]
         #set a core-collapsed boolean, just in case
         clusterDic[clusterName]["coreCollapsed"] = "c" in dataFileTableIII[rowNum][56:59]
+        
+        #encounter rate stuff
+        #if there's no correlation here, it won't be anywhere
+        #convert cluster name
+        encName = "".join(clusterName.lower().split(" "))+" "
+        encIndex = None
+        for i in range(0,len(encounterList)):
+            if encName in encounterList[i]:
+                encIndex = i
+                break
+        if encIndex is None:
+            print(f"Cluster {clusterName} not in external dataset")
+        else:
+            encRateString = encounterList[encIndex][58:66]
+            encRateMan, encRateExp = float(encRateString.split("E")[0]), int(encRateString.split("E")[1])
+            encRate = encRateMan*(10**encRateExp)
+            clusterDic[clusterName]["encounterRate"] = encRate
+        
+        
+        
+            
 
 #We've got our dictionary! Still needs some massaging though. Let's calculate physical radius of cluster cores first.
+#sum all pulsar counts while we're here
+
+totalCount = 0
 for clusterName in clusterDic.keys():
     clusterData = clusterDic[clusterName]
+    totalCount += clusterData["probableCount"]
     d = clusterData["distanceKPc"] * 1000 #parsecs
     r_o = clusterData["coreObsRadiusArcMin"] * 0.000290888 #radians
     clusterData.update({
             "coreRadiusPc" : d*r_o #small-angle approximation is our friend
         })
+ 
+
+
 
 properties = {}
-    
+
 for valueName, title, yLable in GENERATE_PLOTS:
     xValues = []
+    xValuesRatios = []
     yValues = []
     for clusterName in clusterDic.keys():
-        yValues.append(clusterDic[clusterName]["probableCount"])
-        xValues.append(clusterDic[clusterName][valueName])
+
+        xValues.append(clusterDic[clusterName]["probableCount"])
+        xValuesRatios.append(clusterDic[clusterName]["numPerMass"])
+        
+        #two clusters dont have encounter rates
+        #handle that here
+        removed = False
+        try:
+            yValues.append(clusterDic[clusterName][valueName])
+        except KeyError:
+            if valueName == "encounterRate":
+                xValues.pop() #keep lists aligned
+                xValuesRatios.pop()
+                removed = True
+            else:
+                raise KeyError("oops")
+            
+        if not removed:
+            xErrorMin.append(clusterDic[clusterName]["95min"])
+            xErrorMax.append(clusterDic[clusterName]["95max"])
         
     properties[valueName] = list(zip(xValues, yValues))
+        
+    if MAKE_CLUSTER_PLOTS_FLAG: #only if flag is set
+        xError = [xErrorMin, xErrorMax]
+        #plt.scatter(xValues, yValues)
+        plt.yscale("log")
+        if valueName == "encounterRate":
+            plt.xscale("log")
+        plt.title(title)
+        plt.ylabel("Most probable count of pulsars")
+        plt.xlabel(yLable)
+        plt.errorbar(yValues, xValues, yerr=xError, fmt='or', capsize=0) #swap the x and y axes the messy way
+        plt.savefig(path.join(".","plots","properties",f"{valueName}.png"))
+        plt.clf()
+        
+        #do it again with the ratio
+        xError = [xErrorMin, xErrorMax]
+        #plt.scatter(xValues, yValues)
+        #plt.yscale("log")
+        #plt.xscale("log")
+        plt.title(title+" (per solar mass)")
+        plt.ylabel("Pulsar count per solar mass")
+        plt.xlabel(yLable)
+        plt.errorbar(yValues, xValuesRatios, fmt='or', capsize=0) #swap the x and y axes the messy way
+        plt.savefig(path.join(".","plots","properties",f"{valueName}perSolarMass.png"))
+        plt.clf()
+        
+        #do it again with the ratio (log edition)
+        xError = [xErrorMin, xErrorMax]
+        #plt.scatter(xValues, yValues)
+        plt.yscale("log")
+        #plt.xscale("log")
+        plt.title(title+" (per solar mass)")
+        plt.ylabel("Pulsar count per solar mass")
+        plt.xlabel(yLable)
+        plt.errorbar(yValues, xValuesRatios, fmt='or', capsize=0) #swap the x and y axes the messy way
+        plt.savefig(path.join(".","plots","properties",f"{valueName}perSolarMassLog.png"))
+        plt.clf()
+        
+    plt.clf()
 
+simTotal = []
+for i in range(SIMULATION_ROUNDS): #simulation stuff
+    thisSim = []
+    for clusterName, clusterProps in clusterDic.items():        
+        thisSim.extend(generatePop(SIMULATION_MU, SIMULATION_SIGMA, clusterProps["obsCount"], clusterProps["minLum"]))
+    simTotal.extend(thisSim)
+
+if SIMULATION_ROUNDS > 0:
+    binCount = 40
+    
+    plt.hist(simTotal, bins=binCount)
+    plt.ylabel("N(L)")
+    plt.xlabel("log(L)")
+    plt.title("Simulated GC PSR Population by Luminosity")
+    plt.yticks(ticks=[])
+    plt.show()
+
+    plt.clf()
+    simTotal.sort()
+    simTotal.reverse()
+    lumValues = []
+    lumRank = []
+    for i in range(len(simTotal)):
+        lumValues.append(simTotal[i])
+        lumRank.append(log10(i))
+
+    plt.scatter(lumValues, lumRank)
+    plt.show()
+
+    
 #find corrrelation coefficient via Pearson product-moment
 #use numpy.corrcoef to check implementation
 

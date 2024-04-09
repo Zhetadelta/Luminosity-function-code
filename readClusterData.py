@@ -1,6 +1,6 @@
 ﻿from os import path
 from json import load
-from numpy import arange, log10, pi
+from numpy import arange, mean, corrcoef, sqrt, log10, pi
 import matplotlib.pyplot as plt
 from simulation import *
 
@@ -31,6 +31,7 @@ GENERATE_PLOTS = [ #code name, table header tuples
         ("velocityDispersion", "Pulsar Count vs Central Velocity Dispersion", "Central Velocity Dispersion, log(km/s)"),
         ("metallicity", "Pulsar Count vs Cluster Metallicity", "Metallicity (Fe/H)"),
         ("absMag", "Pulsar Count vs Absolute Visual Magnitude", "Absolute Magnitude"),
+        ("encounterRate", "Pulsar Count vs Encounter Rate", "Enounter Rate")
     ]
 
 MIN_OBSERVATIONS = 0 #adjust to eliminate low-data clusters
@@ -46,6 +47,12 @@ with open("clusterData.dat") as dataFile:
     idListTableIII = [row[:12].strip() for row in dataFileTableIII]
     idListTableII = [row[:12].strip() for row in dataFileTableII]
     idListTableI = [row[:12].strip() for row in dataFileTableI]
+    
+    #read encounter data in too
+    encounterList = None
+    with open("clusterEncounters.dat", "r") as encounterFile:
+        encounterList = encounterFile.readlines()
+        
     for clusterName in clusterDic.keys():
         if clusterName not in idListTableIII:
             raise ValueError(f"{clusterName} is invalid. Perhaps it has a different name?")
@@ -66,6 +73,7 @@ with open("clusterData.dat") as dataFile:
                 clusterDic[clusterName].update({
                         prop: 0
                     })
+                
         #attempt to estimate total cluster mass via color + luminosity
         clusterColor = float(dataFileTableII[rowNumMetal][60:67])
         avgTemp = 4600.*(1/(0.92*clusterColor+1.7)+1/(0.92*clusterColor+0.62)) #Ballesteros' formula
@@ -77,6 +85,27 @@ with open("clusterData.dat") as dataFile:
         clusterDic[clusterName]["numPerMass"] = clusterDic[clusterName]["probableCount"]/clusterDic[clusterName]["totalMass"]
         #set a core-collapsed boolean, just in case
         clusterDic[clusterName]["coreCollapsed"] = "c" in dataFileTableIII[rowNum][56:59]
+        
+        #encounter rate stuff
+        #if there's no correlation here, it won't be anywhere
+        #convert cluster name
+        encName = "".join(clusterName.lower().split(" "))+" "
+        encIndex = None
+        for i in range(0,len(encounterList)):
+            if encName in encounterList[i]:
+                encIndex = i
+                break
+        if encIndex is None:
+            print(f"Cluster {clusterName} not in external dataset")
+        else:
+            encRateString = encounterList[encIndex][58:66]
+            encRateMan, encRateExp = float(encRateString.split("E")[0]), int(encRateString.split("E")[1])
+            encRate = encRateMan*(10**encRateExp)
+            clusterDic[clusterName]["encounterRate"] = encRate
+        
+        
+        
+            
 
 #We've got our dictionary! Still needs some massaging though. Let's calculate physical radius of cluster cores first.
 #sum all pulsar counts while we're here
@@ -93,6 +122,9 @@ for clusterName in clusterDic.keys():
  
 
 
+
+properties = {}
+
 for valueName, title, yLable in GENERATE_PLOTS:
     plt.clf()
     xValues = []
@@ -101,16 +133,35 @@ for valueName, title, yLable in GENERATE_PLOTS:
     xErrorMin = []
     xErrorMax = []
     for clusterName in clusterDic.keys():
+
         xValues.append(clusterDic[clusterName]["probableCount"])
         xValuesRatios.append(clusterDic[clusterName]["numPerMass"])
-        yValues.append(clusterDic[clusterName][valueName])
-        xErrorMin.append(clusterDic[clusterName]["95min"])
-        xErrorMax.append(clusterDic[clusterName]["95max"])
+        
+        #two clusters dont have encounter rates
+        #handle that here
+        removed = False
+        try:
+            yValues.append(clusterDic[clusterName][valueName])
+        except KeyError:
+            if valueName == "encounterRate":
+                xValues.pop() #keep lists aligned
+                xValuesRatios.pop()
+                removed = True
+            else:
+                raise KeyError("oops")
+            
+        if not removed:
+            xErrorMin.append(clusterDic[clusterName]["95min"])
+            xErrorMax.append(clusterDic[clusterName]["95max"])
+        
+    properties[valueName] = list(zip(xValues, yValues))
+        
     if MAKE_CLUSTER_PLOTS_FLAG: #only if flag is set
         xError = [xErrorMin, xErrorMax]
         #plt.scatter(xValues, yValues)
         plt.yscale("log")
-        #plt.xscale("log")
+        if valueName == "encounterRate":
+            plt.xscale("log")
         plt.title(title)
         plt.ylabel("Most probable count of pulsars")
         plt.xlabel(yLable)
@@ -172,3 +223,33 @@ if SIMULATION_ROUNDS > 0:
 
     plt.scatter(lumValues, lumRank)
     plt.show()
+
+    
+#find corrrelation coefficient via Pearson product-moment
+#use numpy.corrcoef to check implementation
+
+coeffs = {}
+
+for prop in properties.keys():
+    valueTuples = properties[prop]
+    propList, countList = ([x[0] for x in valueTuples], [x[1] for x in valueTuples])
+    propMean, countMean = (mean(propList), mean(countList))
+    num = 0
+    sumPropSquared = 0
+    sumCountSquared = 0
+    for i in range(len(propList)):
+        num += (propList[i] - propMean)*(countList[i] - countMean)
+        sumPropSquared += (propList[i] - propMean)**2
+        sumCountSquared += (countList[i] - countMean)**2
+    coeff = num/sqrt(sumPropSquared * sumCountSquared)
+
+    npcoeff = corrcoef(propList, y=countList)[0][1]
+    coeffs[prop] = {
+            "mine" : coeff,
+            "numpy" : npcoeff
+        }
+
+with open('correlation_coefficients.txt', "+w") as file:
+    file.write("Property; This implementation; Numpy-calculated\n")
+    for prop in coeffs.keys():
+        file.write(f"{prop.ljust(23)} |{str(round(coeffs[prop]['mine'], 3)).ljust(6)}|{str(round(coeffs[prop]['numpy'], 3)).ljust(5)}\n")

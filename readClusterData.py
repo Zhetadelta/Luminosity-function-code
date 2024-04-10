@@ -2,12 +2,22 @@
 from json import load
 from numpy import arange, mean, corrcoef, sqrt, log10, pi
 import matplotlib.pyplot as plt
+from matplotlib import rc
 from simulation import *
 
 MAKE_CLUSTER_PLOTS_FLAG = True #change this to regen plots
-SIMULATION_ROUNDS = 1000 #number of rounds to run simulation
+SIMULATION_ROUNDS = 1 #number of rounds to run simulation
 SIMULATION_MU = -1.1
 SIMULATION_SIGMA = 0.9
+
+font = {
+        "family" : 'normal',
+        "weight" : "bold",
+        "size" : 14
+    }
+
+rc('font', **font)
+
 
 clusterDic = {}
 with open("firstPass.dat") as dicFile:

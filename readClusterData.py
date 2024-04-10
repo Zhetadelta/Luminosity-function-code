@@ -195,6 +195,37 @@ for valueName, title, yLable in GENERATE_PLOTS:
         
     plt.clf()
 
+#generate histogram of real data before simulation
+binCount = 40
+
+total = []
+for clusterName, clusterProps in clusterDic.items():
+    total.extend([log10(float(lum)) for lum in clusterProps["lumList"]])
+    
+plt.hist(total, bins=binCount)
+plt.ylabel("N(L)")
+plt.xlabel("log L")
+plt.title("Observed GC PSR Population by Luminosity")
+plt.yticks(ticks=[])
+plt.show()
+
+plt.clf()
+total.sort()
+total.reverse()
+lumValues = []
+lumRank = []
+for i in range(len(total)):
+    lumValues.append(total[i])
+    lumRank.append(log10(i))
+
+plt.scatter(lumValues, lumRank)
+plt.ylabel("log N(L > L_0)")
+plt.xlabel("log L_0")
+plt.yticks(ticks=[])
+plt.title("Observed GC PSR Cumulative Count")
+plt.show()
+
+
 simTotal = []
 for i in range(SIMULATION_ROUNDS): #simulation stuff
     thisSim = []
@@ -207,7 +238,7 @@ if SIMULATION_ROUNDS > 0:
     
     plt.hist(simTotal, bins=binCount)
     plt.ylabel("N(L)")
-    plt.xlabel("log(L)")
+    plt.xlabel("log L")
     plt.title("Simulated GC PSR Population by Luminosity")
     plt.yticks(ticks=[])
     plt.show()
@@ -222,6 +253,10 @@ if SIMULATION_ROUNDS > 0:
         lumRank.append(log10(i))
 
     plt.scatter(lumValues, lumRank)
+    plt.ylabel("log N(L > L_0)")
+    plt.xlabel("log L_0")
+    plt.yticks(ticks=[])
+    plt.title("Simulated GC PSR Cumulative Count")
     plt.show()
 
     

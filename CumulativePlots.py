@@ -13,27 +13,33 @@ b = 0.9  # sigma of lognormal
 minCount = 0 #minimum number of pulsars in cluster to be eligible
 
 # locate data file and read clusters into dictionary
-DATAFILENAME = "Data1102023.csv"
-clusters = {}
+DATAFILENAME = "Data03272024.csv"
 
-with open(DATAFILENAME, newline='') as datafile:
-    fileReader = csv.reader(datafile)
-    for row in fileReader: 
-        clusterName = row[1]
-        if clusterName == "47 Tucanae": #Force 47 Tuc to use NGC name for ReadClusterData.py processing
-            clusterName = "NGC 104"
-        lumValue = row[9]
-        if row[0] != "Name" and lumValue: #exclude header row, only count pulsars with luminosities
-            if clusterName not in clusters:
-                clusters[clusterName] = { #add new cluster to dictionary
-                        "minLum" : lumValue,
-                        "count" : 1
-                    }
-            else:
-                clusters[clusterName].update({ #update existing cluster
-                        "minLum" : min(clusters[clusterName]["minLum"], lumValue),
-                        "count" : clusters[clusterName]["count"] + 1
-                    })
+with open("firstpass.dat", "r") as firstpass:
+    clusters = load(firstpass)
+
+# with open(DATAFILENAME, newline='') as datafile:
+#     fileReader = csv.reader(datafile)
+#     for row in fileReader: 
+#         clusterName = row[1]
+#         if clusterName == "47 Tucanae": #Force 47 Tuc to use NGC name for ReadClusterData.py processing
+#             clusterName = "NGC 104"
+#         lumValue = row[9]
+#         if row[0] != "Name" and lumValue: #exclude header row, only count pulsars with luminosities
+#             if clusterName not in clusters:
+#                 clusters[clusterName] = { #add new cluster to dictionary
+#                         "minLum" : lumValue,
+#                         "count" : 1
+#                     }
+#             else:
+#                 clusters[clusterName].update({ #update existing cluster
+#                         "minLum" : min(clusters[clusterName]["minLum"], lumValue),
+#                         "count" : clusters[clusterName]["count"] + 1
+#                     })
+#                 try:
+#                     clusters[clusterName]["lumList"].append(lumValue)
+#                 except KeyError:
+#                     clusters[clusterName]["lumList"] = [lumValue]
 
 
 ###
@@ -58,6 +64,7 @@ def likelihood(n):
 clusterInfo = {}
 
 for clusterName in clusters.keys(): #loop through every cluster in dataset
+     
     if clusters[clusterName]["count"] >= minCount:
         #read in cluster-specific values
         o = int(clusters[clusterName]["count"])   # number of observed pulsars in the cluster
@@ -103,7 +110,8 @@ for clusterName in clusters.keys(): #loop through every cluster in dataset
                         "probableCount" : nhat,
                         "95min" : int(intervalMin),
                         "95max" : int(intervalMax),
-                        "minLum" : l
+                        "minLum" : l,
+                        "lumList" : clusters[clusterName]["lumList"]
                 }
             })
         

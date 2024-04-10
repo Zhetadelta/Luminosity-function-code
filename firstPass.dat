@@ -4,181 +4,389 @@
         "probableCount": 133,
         "95min": 92,
         "95max": 195,
-        "minLum": 0.6
+        "minLum": 0.6,
+        "lumList": [
+            "7.3",
+            "4.5",
+            "4.3",
+            "3.0",
+            "1.0",
+            "1.8",
+            "1.8",
+            "10.9",
+            "0.8",
+            "1.4",
+            "0.6",
+            "2.0",
+            "0.8",
+            "1.0",
+            "0.8",
+            "0.8",
+            "0.8",
+            "1.2",
+            "0.8",
+            "0.8",
+            "3.1",
+            "1.7"
+        ]
     },
     "NGC 1851": {
         "obsCount": 14,
         "probableCount": 211,
         "95min": 129,
         "95max": 347,
-        "minLum": 1.8
+        "minLum": 1.8,
+        "lumList": [
+            "16.6",
+            "5.6",
+            "5.2",
+            "8.0",
+            "4.5",
+            "1.8",
+            "6.8",
+            "2.2",
+            "2.1",
+            "1.8",
+            "2.0",
+            "2.4",
+            "1.8",
+            "2.1"
+        ]
     },
     "NGC 5139": {
         "obsCount": 5,
         "probableCount": 26,
         "95min": 13,
         "95max": 48,
-        "minLum": 0.5
+        "minLum": 0.5,
+        "lumList": [
+            "1.8",
+            "1.5",
+            "0.8",
+            "0.7",
+            "0.5"
+        ]
     },
     "NGC 5272": {
         "obsCount": 4,
         "probableCount": 24,
         "95min": 10,
         "95max": 44,
-        "minLum": 0.6
+        "minLum": 0.6,
+        "lumList": [
+            "0.7",
+            "1.5",
+            "0.6",
+            "1.0"
+        ]
     },
     "NGC 5904": {
         "obsCount": 5,
         "probableCount": 26,
         "95min": 13,
         "95max": 48,
-        "minLum": 0.5
+        "minLum": 0.5,
+        "lumList": [
+            "6.8",
+            "1.4",
+            "2.2",
+            "0.5",
+            "0.6"
+        ]
     },
     "NGC 5986": {
         "obsCount": 1,
         "probableCount": 25,
         "95min": 5,
         "95max": 47,
-        "minLum": 3.1
+        "minLum": 3.1,
+        "lumList": [
+            "3.1"
+        ]
     },
     "NGC 6121": {
         "obsCount": 1,
         "probableCount": 73,
         "95min": 13,
         "95max": 141,
-        "minLum": 7.7
+        "minLum": 7.7,
+        "lumList": [
+            "7.7"
+        ]
     },
     "NGC 6205": {
         "obsCount": 6,
         "probableCount": 32,
         "95min": 16,
         "95max": 58,
-        "minLum": 0.5
+        "minLum": 0.5,
+        "lumList": [
+            "7.1",
+            "1.1",
+            "1.5",
+            "1.2",
+            "0.5",
+            "0.5"
+        ]
     },
     "NGC 6266": {
-        "obsCount": 7,
-        "probableCount": 32,
-        "95min": 17,
-        "95max": 57,
-        "minLum": 0.4
+        "obsCount": 10,
+        "probableCount": 45,
+        "95min": 27,
+        "95max": 77,
+        "minLum": 0.4,
+        "lumList": [
+            "18.5",
+            "13.9",
+            "13.9",
+            "5.3",
+            "3.0",
+            "0.4",
+            "3.7",
+            "2.0",
+            "0.8",
+            "1.7"
+        ]
     },
     "NGC 6342": {
         "obsCount": 1,
         "probableCount": 294,
         "95min": 54,
         "95max": 571,
-        "minLum": 21.7
+        "minLum": 21.7,
+        "lumList": [
+            "21.7"
+        ]
     },
     "Terzan 5": {
         "obsCount": 39,
         "probableCount": 179,
         "95min": 136,
         "95max": 236,
-        "minLum": 0.4
+        "minLum": 0.4,
+        "lumList": [
+            "128.5",
+            "52.4",
+            "3.4",
+            "8.1",
+            "2.6",
+            "1.1",
+            "1.9",
+            "4.5",
+            "2.8",
+            "3.1",
+            "4.6",
+            "6.7",
+            "7.1",
+            "14.8",
+            "6.0",
+            "2.7",
+            "1.7",
+            "1.0",
+            "1.2",
+            "1.4",
+            "4.8",
+            "2.6",
+            "2.0",
+            "1.8",
+            "1.4",
+            "1.4",
+            "2.1",
+            "1.5",
+            "6.3",
+            "2.7",
+            "1.6",
+            "0.8",
+            "0.7",
+            "1.6",
+            "1.6",
+            "1.4",
+            "0.4",
+            "1.2",
+            "1.5"
+        ]
     },
     "NGC 6440": {
         "obsCount": 5,
         "probableCount": 83,
         "95min": 37,
         "95max": 155,
-        "minLum": 2.0
+        "minLum": 2.0,
+        "lumList": [
+            "5.6",
+            "5.2",
+            "8.9",
+            "2.7",
+            "2.0"
+        ]
     },
     "NGC 6441": {
         "obsCount": 3,
         "probableCount": 55,
         "95min": 20,
         "95max": 104,
-        "minLum": 2.2
+        "minLum": 2.2,
+        "lumList": [
+            "8.2",
+            "3.3",
+            "2.2"
+        ]
     },
     "NGC 6517": {
         "obsCount": 7,
         "probableCount": 26,
         "95min": 15,
         "95max": 46,
-        "minLum": 0.3
+        "minLum": 0.3,
+        "lumList": [
+            "4.0",
+            "1.3",
+            "1.3",
+            "2.0",
+            "0.6",
+            "0.5",
+            "0.3"
+        ]
     },
     "NGC 6522": {
         "obsCount": 4,
         "probableCount": 15,
         "95min": 7,
         "95max": 27,
-        "minLum": 0.3
+        "minLum": 0.3,
+        "lumList": [
+            "41.5",
+            "1.7",
+            "0.3",
+            "0.4"
+        ]
     },
     "NGC 6539": {
         "obsCount": 1,
         "probableCount": 1477,
         "95min": 270,
         "95max": 2873,
-        "minLum": 60.8
+        "minLum": 60.8,
+        "lumList": [
+            "60.8"
+        ]
     },
     "NGC 6544": {
         "obsCount": 1,
         "probableCount": 100,
         "95min": 18,
         "95max": 193,
-        "minLum": 9.9
+        "minLum": 9.9,
+        "lumList": [
+            "9.9"
+        ]
     },
     "NGC 6624": {
         "obsCount": 6,
         "probableCount": 95,
         "95min": 46,
         "95max": 176,
-        "minLum": 1.9
+        "minLum": 1.9,
+        "lumList": [
+            "44.9",
+            "4.4",
+            "3.8",
+            "3.0",
+            "2.9",
+            "1.9"
+        ]
     },
     "NGC 6626": {
         "obsCount": 3,
         "probableCount": 11,
         "95min": 5,
         "95max": 20,
-        "minLum": 0.3
+        "minLum": 0.3,
+        "lumList": [
+            "69.6",
+            "0.3",
+            "0.5"
+        ]
     },
     "NGC 6656": {
         "obsCount": 2,
         "probableCount": 9,
         "95min": 3,
         "95max": 16,
-        "minLum": 0.4
+        "minLum": 0.4,
+        "lumList": [
+            "2.0",
+            "0.4"
+        ]
     },
     "NGC 6712": {
         "obsCount": 1,
         "probableCount": 7,
         "95min": 1,
         "95max": 12,
-        "minLum": 0.8
+        "minLum": 0.8,
+        "lumList": [
+            "0.8"
+        ]
     },
     "NGC 6749": {
         "obsCount": 1,
         "probableCount": 12,
         "95min": 2,
         "95max": 22,
-        "minLum": 1.4
+        "minLum": 1.4,
+        "lumList": [
+            "1.4"
+        ]
     },
     "NGC 6752": {
         "obsCount": 4,
         "probableCount": 30,
         "95min": 13,
         "95max": 56,
-        "minLum": 0.8
+        "minLum": 0.8,
+        "lumList": [
+            "0.8",
+            "0.8",
+            "1.1",
+            "0.9"
+        ]
     },
     "NGC 6838": {
         "obsCount": 1,
         "probableCount": 8,
         "95min": 2,
         "95max": 14,
-        "minLum": 0.9
+        "minLum": 0.9,
+        "lumList": [
+            "0.9"
+        ]
     },
     "NGC 7078": {
         "obsCount": 8,
         "probableCount": 1034,
         "95min": 532,
         "95max": 1882,
-        "minLum": 12.0
+        "minLum": 12.0,
+        "lumList": [
+            "21.6",
+            "18.7",
+            "12.0",
+            "6.4",
+            "4.5",
+            "2.6",
+            "2.4",
+            "3.0"
+        ]
     },
     "NGC 7099": {
         "obsCount": 1,
         "probableCount": 45,
         "95min": 8,
         "95max": 86,
-        "minLum": 5.2
+        "minLum": 5.2,
+        "lumList": [
+            "5.2"
+        ]
     }
 }

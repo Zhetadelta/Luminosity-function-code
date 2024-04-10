@@ -29,13 +29,18 @@ if __name__ == "__main__":
                 if clusterName not in clusters:
                     clusters[clusterName] = { #add new cluster to dictionary
                             "minLum" : lumValue,
-                            "count" : 1
+                            "count" : 1,
+                            "lumList" : [lumValue]
                         }
                 else:
                     clusters[clusterName].update({ #update existing cluster
                             "minLum" : min(clusters[clusterName]["minLum"], lumValue),
                             "count" : clusters[clusterName]["count"] + 1
                         })
+                    try:
+                        clusters[clusterName]["lumList"].append(lumValue)
+                    except AttributeError:
+                        clusters[clusterName]["lumList"] = [lumValue]
 
 
     ###
@@ -88,7 +93,9 @@ if __name__ == "__main__":
                     clusterName : {
                             "obsCount": clusters[clusterName]["count"],
                             "probableCount" : nhat,
-                            "minLum" : clusters[clusterName]["minLum"]
+                            "minLum" : clusters[clusterName]["minLum"],
+                            "lumList" : clusters[clusterName]["lumList"],
+                            "count" : len(clusters[clusterName]["lumList"])
                     }
                 })
         

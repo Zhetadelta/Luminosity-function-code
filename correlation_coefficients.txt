@@ -1,9 +1,9 @@
 Property; This implementation; Numpy-calculated
-radialVelocity          |0.063 |0.063
+radialVelocity          |0.062 |0.062
 centralConcentration    |0.195 |0.195
-luminosityDensity       |0.105 |0.105
-coreRadiusPc            |-0.095|-0.095
-velocityDispersion      |-0.032|-0.032
+luminosityDensity       |0.106 |0.106
+coreRadiusPc            |-0.096|-0.096
+velocityDispersion      |-0.03 |-0.03
 metallicity             |0.018 |0.018
-absMag                  |-0.107|-0.107
+absMag                  |-0.109|-0.109
 encounterRate           |0.23  |0.23 

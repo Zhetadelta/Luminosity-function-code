@@ -31,7 +31,7 @@ GENERATE_PLOTS = [ #code name, table header tuples
         ("velocityDispersion", "Pulsar Count vs Central Velocity Dispersion", "Central Velocity Dispersion, log(km/s)"),
         ("metallicity", "Pulsar Count vs Cluster Metallicity", "Metallicity (Fe/H)"),
         ("absMag", "Pulsar Count vs Absolute Visual Magnitude", "Absolute Magnitude"),
-        ("encounterRate", "Pulsar Count vs Encounter Rate", "Enounter Rate")
+        ("encounterRate", "Pulsar Count vs Encounter Rate", "Encounter Rate")
     ]
 
 MIN_OBSERVATIONS = 0 #adjust to eliminate low-data clusters

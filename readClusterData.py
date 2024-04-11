@@ -44,7 +44,7 @@ GENERATE_PLOTS = [ #code name, table header tuples
         ("encounterRate", "Pulsar Count vs Encounter Rate", "Encounter Rate")
     ]
 
-MIN_OBSERVATIONS = 0 #adjust to eliminate low-data clusters
+MIN_OBSERVATIONS = 2 #adjust to eliminate low-data clusters
     
 with open("clusterData.dat") as dataFile:
     #here we go. First, load into a list:
@@ -105,8 +105,14 @@ with open("clusterData.dat") as dataFile:
             if encName in encounterList[i]:
                 encIndex = i
                 break
+        outliers = None
+        with open("encRateOutliers.dat", "r") as outliersFile:
+            outliers = [line.strip()+" " for line in outliersFile.readlines()]
         if encIndex is None:
             print(f"Cluster {clusterName} not in external dataset")
+        #trying a thing
+        #elif encName in outliers:
+            #print(f"Cluster {clusterName} is excluded from encounter analysis")
         else:
             encRateString = encounterList[encIndex][58:66]
             encRateMan, encRateExp = float(encRateString.split("E")[0]), int(encRateString.split("E")[1])
@@ -143,26 +149,26 @@ for valueName, title, yLable in GENERATE_PLOTS:
     xErrorMin = []
     xErrorMax = []
     for clusterName in clusterDic.keys():
-
-        xValues.append(clusterDic[clusterName]["probableCount"])
-        xValuesRatios.append(clusterDic[clusterName]["numPerMass"])
+        if clusterDic[clusterName]["obsCount"] >= MIN_OBSERVATIONS:
+            xValues.append(clusterDic[clusterName]["probableCount"])
+            xValuesRatios.append(clusterDic[clusterName]["numPerMass"])
         
-        #two clusters dont have encounter rates
-        #handle that here
-        removed = False
-        try:
-            yValues.append(clusterDic[clusterName][valueName])
-        except KeyError:
-            if valueName == "encounterRate":
-                xValues.pop() #keep lists aligned
-                xValuesRatios.pop()
-                removed = True
-            else:
-                raise KeyError("oops")
+            #two clusters dont have encounter rates
+            #handle that here
+            removed = False
+            try:
+                yValues.append(clusterDic[clusterName][valueName])
+            except KeyError:
+                if valueName == "encounterRate":
+                    xValues.pop() #keep lists aligned
+                    xValuesRatios.pop()
+                    removed = True
+                else:
+                    raise KeyError("oops")
             
-        if not removed:
-            xErrorMin.append(clusterDic[clusterName]["95min"])
-            xErrorMax.append(clusterDic[clusterName]["95max"])
+            if not removed:
+                xErrorMin.append(clusterDic[clusterName]["95min"])
+                xErrorMax.append(clusterDic[clusterName]["95max"])
         
     properties[valueName] = list(zip(xValues, yValues))
         

@@ -248,6 +248,15 @@ maxcount = max(counts)
 plt.hist([clusterDic[cluster]["obsCount"] for cluster in clusterDic], bins=list(range(maxcount+1)))
 plt.show()
 
+#print sum-of-minima and sum-of-maxima information for uncertainties
+small = 0
+likely = 0
+big = 0
+for cluster in clusterDic:
+    small += clusterDic[cluster]["95min"]
+    likely += clusterDic[cluster]["probableCount"]
+    big += clusterDic[cluster]["95max"]
+print(f"Minima: {small}, Likely: {likely}, Big: {big}")
 
 simTotal = []
 for i in range(SIMULATION_ROUNDS): #simulation stuff

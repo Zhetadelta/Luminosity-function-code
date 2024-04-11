@@ -74,14 +74,14 @@ clusterInfo = {}
 
 for clusterName in clusters.keys(): #loop through every cluster in dataset
      
-    if clusters[clusterName]["count"] >= minCount:
+    if clusters[clusterName]["obsCount"] >= minCount:
         #read in cluster-specific values
-        o = int(clusters[clusterName]["count"])   # number of observed pulsars in the cluster
+        o = int(clusters[clusterName]["obsCount"])   # number of observed pulsars in the cluster
         l = float(clusters[clusterName]["minLum"]) # minimum luminosity probed (mJy kpc^2)
 
         # find the most probable value and decide on range of pulsars to plot over
         nhat = int(o / fraction_above(l))
-        n_values = np.arange(o, 2*nhat)  # Adjust the range as needed
+        n_values = np.arange(o, 3*nhat)  # Adjust the range as needed
 
         # Calculate the likelihood for each value of n, convert to normalized cumulative sum
         results = [likelihood(n) for n in n_values]
@@ -116,7 +116,7 @@ for clusterName in clusters.keys(): #loop through every cluster in dataset
         #Add cluster to dictionary
         clusterInfo.update({
                 clusterName : {
-                        "obsCount": clusters[clusterName]["count"],
+                        "obsCount": clusters[clusterName]["obsCount"],
                         "probableCount" : nhat,
                         "95min" : int(intervalMin),
                         "95max" : int(intervalMax),

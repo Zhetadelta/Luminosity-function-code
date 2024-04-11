@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
             # find the most probable value and decide on range of pulsars to plot over
             nhat = int(o / fraction_above(l))
-            n_values = np.arange(o, 2*nhat)  # Adjust the range as needed
+            n_values = np.arange(o, 3*nhat)  # Adjust the range as needed
 
             # Calculate the likelihood for each value of n
             results = [likelihood(n) for n in n_values]

@@ -241,6 +241,13 @@ plt.yticks(ticks=[])
 plt.title("Observed GC PSR Cumulative Count")
 plt.show()
 
+#now a histogram of cluster populations
+plt.clf()
+counts = [int(clusterDic[cluster]["obsCount"]) for cluster in clusterDic]
+maxcount = max(counts)
+plt.hist([clusterDic[cluster]["obsCount"] for cluster in clusterDic], bins=list(range(maxcount+1)))
+plt.show()
+
 
 simTotal = []
 for i in range(SIMULATION_ROUNDS): #simulation stuff

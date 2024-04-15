@@ -332,7 +332,7 @@ for prop in properties.keys():
     plt.xticks(ticks=[-1, 0, coeff, 1], labels=["-1", "0", "ρ", "1"])
     plt.subplots_adjust(bottom=0.4)
     print(f"{prop}")
-    plt.show()
+    #plt.show()
     
 
 

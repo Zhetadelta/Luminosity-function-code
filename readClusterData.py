@@ -1,17 +1,18 @@
 ﻿from os import path
 from json import load
-from numpy import arange, mean, corrcoef, sqrt, log10, pi
+from numpy import arange, mean, corrcoef, sqrt, log10, pi, linspace
 import matplotlib.pyplot as plt
 from matplotlib import rc
 from simulation import *
 
-MAKE_CLUSTER_PLOTS_FLAG = True #change this to regen plots
-SIMULATION_ROUNDS = 1 #number of rounds to run simulation
+MAKE_CLUSTER_PLOTS_FLAG = False #change this to regen plots
+SIMULATION_ROUNDS = 0 #number of rounds to run simulation
 SIMULATION_MU = -1.1
 SIMULATION_SIGMA = 0.9
+MIN_OBSERVATIONS = 2 #adjust to eliminate low-data clusters
+
 
 font = {
-        "family" : 'normal',
         "weight" : "bold",
         "size" : 14
     }
@@ -22,7 +23,10 @@ rc('font', **font)
 clusterDic = {}
 with open("firstPass.dat") as dicFile:
     #load dictionary from LuminosityFunctions.py into code
-    clusterDic = load(dicFile)
+    rawClusterDic = load(dicFile)
+    for cluster in rawClusterDic:
+        if rawClusterDic[cluster]["obsCount"] >= MIN_OBSERVATIONS:
+            clusterDic[cluster] = rawClusterDic[cluster]
     
 #hard-coded column name, start of slice, end of slice tuples for table III properties
 DATA_FILE_COLUMNS = [
@@ -44,7 +48,6 @@ GENERATE_PLOTS = [ #code name, table header tuples
         ("encounterRate", "Pulsar Count vs Encounter Rate", "Encounter Rate")
     ]
 
-MIN_OBSERVATIONS = 2 #adjust to eliminate low-data clusters
     
 with open("clusterData.dat") as dataFile:
     #here we go. First, load into a list:
@@ -296,6 +299,7 @@ if SIMULATION_ROUNDS > 0:
 #use numpy.corrcoef to check implementation
 
 coeffs = {}
+datapoints = len(clusterDic)
 
 for prop in properties.keys():
     valueTuples = properties[prop]
@@ -315,6 +319,22 @@ for prop in properties.keys():
             "mine" : coeff,
             "numpy" : npcoeff
         }
+    
+    coeffRange = linspace(-1, 1, 2000)
+    coeffPDF = []
+    for i in coeffRange:
+        coeffPDF.append( 
+                (1-i**2)**((datapoints-1)/2)/((1-i*coeff)**(datapoints-1.5))*(1+(1/(datapoints-0.5))*((1+i*coeff)/(8)))
+            )
+    plt.clf()
+    plt.plot(coeffRange, coeffPDF)
+    plt.yticks(ticks=[])
+    plt.xticks(ticks=[-1, 0, coeff, 1], labels=["-1", "0", "ρ", "1"])
+    plt.subplots_adjust(bottom=0.4)
+    print(f"{prop}")
+    plt.show()
+    
+
 
 with open('correlation_coefficients.txt', "+w") as file:
     file.write("Property; This implementation; Numpy-calculated\n")

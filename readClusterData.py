@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 from simulation import *
 
-MAKE_CLUSTER_PLOTS_FLAG = False #change this to regen plots
-SIMULATION_ROUNDS = 0 #number of rounds to run simulation
+MAKE_CLUSTER_PLOTS_FLAG = True #change this to regen plots
+SIMULATION_ROUNDS = 100 #number of rounds to run simulation
 SIMULATION_MU = -1.1
 SIMULATION_SIGMA = 0.9
 MIN_OBSERVATIONS = 2 #adjust to eliminate low-data clusters
@@ -332,6 +332,7 @@ for prop in properties.keys():
     plt.xticks(ticks=[-1, 0, coeff, 1], labels=["-1", "0", "ρ", "1"])
     plt.subplots_adjust(bottom=0.4)
     print(f"{prop}")
+    plt.savefig(f"{prop}_pdf.png")
     #plt.show()
     
 

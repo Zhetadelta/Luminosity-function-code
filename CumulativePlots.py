@@ -22,7 +22,7 @@ font = {
 rc('font', **font)
 
 # locate data file and read clusters into dictionary
-DATAFILENAME = "Data03272024.csv"
+DATAFILENAME = "Data09292024.csv"
 
 with open("firstpass.dat", "r") as firstpass:
     clusters = load(firstpass)

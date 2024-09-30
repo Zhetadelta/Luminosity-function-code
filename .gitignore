@@ -365,3 +365,4 @@ FodyWeavers.xsd
 # python environments
 GC_env/
 /LuminosityFunctions.pyproj
+/..bfg-report

@@ -1,18 +1,32 @@
 ﻿from os import path
 from json import load
-from numpy import arange, mean, corrcoef, sqrt, log10, pi
+from numpy import arange, mean, corrcoef, sqrt, log10, pi, linspace
 import matplotlib.pyplot as plt
+from matplotlib import rc
 from simulation import *
 
 MAKE_CLUSTER_PLOTS_FLAG = True #change this to regen plots
-SIMULATION_ROUNDS = 1000 #number of rounds to run simulation
+SIMULATION_ROUNDS = 100 #number of rounds to run simulation
 SIMULATION_MU = -1.1
 SIMULATION_SIGMA = 0.9
+MIN_OBSERVATIONS = 2 #adjust to eliminate low-data clusters
+
+
+font = {
+        "weight" : "bold",
+        "size" : 14
+    }
+
+rc('font', **font)
+
 
 clusterDic = {}
 with open("firstPass.dat") as dicFile:
     #load dictionary from LuminosityFunctions.py into code
-    clusterDic = load(dicFile)
+    rawClusterDic = load(dicFile)
+    for cluster in rawClusterDic:
+        if rawClusterDic[cluster]["obsCount"] >= MIN_OBSERVATIONS:
+            clusterDic[cluster] = rawClusterDic[cluster]
     
 #hard-coded column name, start of slice, end of slice tuples for table III properties
 DATA_FILE_COLUMNS = [
@@ -31,10 +45,9 @@ GENERATE_PLOTS = [ #code name, table header tuples
         ("velocityDispersion", "Pulsar Count vs Central Velocity Dispersion", "Central Velocity Dispersion, log(km/s)"),
         ("metallicity", "Pulsar Count vs Cluster Metallicity", "Metallicity (Fe/H)"),
         ("absMag", "Pulsar Count vs Absolute Visual Magnitude", "Absolute Magnitude"),
-        ("encounterRate", "Pulsar Count vs Encounter Rate", "Enounter Rate")
+        ("encounterRate", "Pulsar Count vs Encounter Rate", "Encounter Rate")
     ]
 
-MIN_OBSERVATIONS = 0 #adjust to eliminate low-data clusters
     
 with open("clusterData.dat") as dataFile:
     #here we go. First, load into a list:
@@ -95,8 +108,14 @@ with open("clusterData.dat") as dataFile:
             if encName in encounterList[i]:
                 encIndex = i
                 break
+        outliers = None
+        with open("encRateOutliers.dat", "r") as outliersFile:
+            outliers = [line.strip()+" " for line in outliersFile.readlines()]
         if encIndex is None:
             print(f"Cluster {clusterName} not in external dataset")
+        #trying a thing
+        #elif encName in outliers:
+            #print(f"Cluster {clusterName} is excluded from encounter analysis")
         else:
             encRateString = encounterList[encIndex][58:66]
             encRateMan, encRateExp = float(encRateString.split("E")[0]), int(encRateString.split("E")[1])
@@ -133,26 +152,26 @@ for valueName, title, yLable in GENERATE_PLOTS:
     xErrorMin = []
     xErrorMax = []
     for clusterName in clusterDic.keys():
-
-        xValues.append(clusterDic[clusterName]["probableCount"])
-        xValuesRatios.append(clusterDic[clusterName]["numPerMass"])
+        if clusterDic[clusterName]["obsCount"] >= MIN_OBSERVATIONS:
+            xValues.append(clusterDic[clusterName]["probableCount"])
+            xValuesRatios.append(clusterDic[clusterName]["numPerMass"])
         
-        #two clusters dont have encounter rates
-        #handle that here
-        removed = False
-        try:
-            yValues.append(clusterDic[clusterName][valueName])
-        except KeyError:
-            if valueName == "encounterRate":
-                xValues.pop() #keep lists aligned
-                xValuesRatios.pop()
-                removed = True
-            else:
-                raise KeyError("oops")
+            #two clusters dont have encounter rates
+            #handle that here
+            removed = False
+            try:
+                yValues.append(clusterDic[clusterName][valueName])
+            except KeyError:
+                if valueName == "encounterRate":
+                    xValues.pop() #keep lists aligned
+                    xValuesRatios.pop()
+                    removed = True
+                else:
+                    raise KeyError("oops")
             
-        if not removed:
-            xErrorMin.append(clusterDic[clusterName]["95min"])
-            xErrorMax.append(clusterDic[clusterName]["95max"])
+            if not removed:
+                xErrorMin.append(clusterDic[clusterName]["95min"])
+                xErrorMax.append(clusterDic[clusterName]["95max"])
         
     properties[valueName] = list(zip(xValues, yValues))
         
@@ -195,6 +214,53 @@ for valueName, title, yLable in GENERATE_PLOTS:
         
     plt.clf()
 
+#generate histogram of real data before simulation
+binCount = 40
+
+total = []
+for clusterName, clusterProps in clusterDic.items():
+    total.extend([log10(float(lum)) for lum in clusterProps["lumList"]])
+    
+plt.hist(total, bins=binCount)
+plt.ylabel("N(L)")
+plt.xlabel("log L")
+plt.title("Observed GC PSR Population by Luminosity")
+plt.yticks(ticks=[])
+plt.show()
+
+plt.clf()
+total.sort()
+total.reverse()
+lumValues = []
+lumRank = []
+for i in range(len(total)):
+    lumValues.append(total[i])
+    lumRank.append(log10(i))
+
+plt.scatter(lumValues, lumRank)
+plt.ylabel("log N(L > L_0)")
+plt.xlabel("log L_0")
+plt.yticks(ticks=[])
+plt.title("Observed GC PSR Cumulative Count")
+plt.show()
+
+#now a histogram of cluster populations
+plt.clf()
+counts = [int(clusterDic[cluster]["obsCount"]) for cluster in clusterDic]
+maxcount = max(counts)
+plt.hist([clusterDic[cluster]["obsCount"] for cluster in clusterDic], bins=list(range(maxcount+1)))
+plt.show()
+
+#print sum-of-minima and sum-of-maxima information for uncertainties
+small = 0
+likely = 0
+big = 0
+for cluster in clusterDic:
+    small += clusterDic[cluster]["95min"]
+    likely += clusterDic[cluster]["probableCount"]
+    big += clusterDic[cluster]["95max"]
+print(f"Minima: {small}, Likely: {likely}, Big: {big}")
+
 simTotal = []
 for i in range(SIMULATION_ROUNDS): #simulation stuff
     thisSim = []
@@ -207,7 +273,7 @@ if SIMULATION_ROUNDS > 0:
     
     plt.hist(simTotal, bins=binCount)
     plt.ylabel("N(L)")
-    plt.xlabel("log(L)")
+    plt.xlabel("log L")
     plt.title("Simulated GC PSR Population by Luminosity")
     plt.yticks(ticks=[])
     plt.show()
@@ -222,6 +288,10 @@ if SIMULATION_ROUNDS > 0:
         lumRank.append(log10(i))
 
     plt.scatter(lumValues, lumRank)
+    plt.ylabel("log N(L > L_0)")
+    plt.xlabel("log L_0")
+    plt.yticks(ticks=[])
+    plt.title("Simulated GC PSR Cumulative Count")
     plt.show()
 
     
@@ -229,6 +299,7 @@ if SIMULATION_ROUNDS > 0:
 #use numpy.corrcoef to check implementation
 
 coeffs = {}
+datapoints = len(clusterDic)
 
 for prop in properties.keys():
     valueTuples = properties[prop]
@@ -248,6 +319,23 @@ for prop in properties.keys():
             "mine" : coeff,
             "numpy" : npcoeff
         }
+    
+    coeffRange = linspace(-1, 1, 2000)
+    coeffPDF = []
+    for i in coeffRange:
+        coeffPDF.append( 
+                (1-i**2)**((datapoints-1)/2)/((1-i*coeff)**(datapoints-1.5))*(1+(1/(datapoints-0.5))*((1+i*coeff)/(8)))
+            )
+    plt.clf()
+    plt.plot(coeffRange, coeffPDF)
+    plt.yticks(ticks=[])
+    plt.xticks(ticks=[-1, 0, coeff, 1], labels=["-1", "0", "ρ", "1"])
+    plt.subplots_adjust(bottom=0.4)
+    print(f"{prop}")
+    plt.savefig(f"{prop}_pdf.png")
+    #plt.show()
+    
+
 
 with open('correlation_coefficients.txt', "+w") as file:
     file.write("Property; This implementation; Numpy-calculated\n")
